@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kepler"
+description = "UMinho's Informatic Engineering schedule generator"
+version = "0.0.1"
+
+authors = [
+    {name = "CAOS", email = "caos@cesium.di.uminho.pt"},
+]
+
+readme = "README.md"
+license = { file = "LICENSE" }
+
+requires-python = ">= 3.12"
+
+keywords = ["scheduler", "milp", "integer-programming"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Education",
+    "Topic :: Office/Business :: Scheduling",
+    "Typing :: Typed"
+]
+
+optional-dependencies.dev = [
+    "mypy"
+]
+
+[project.urls]
+Homepage = "https://github.com/cesium/kepler"
+Repository = "https://github.com/cesium/kepler"
+"Bug Tracker" = "https://github.com/cesium/kepler/issues"
+
+[tool.mypy]
+packages = ["kepler"]
+strict = true
+
+[tool.setuptools]
+packages = ["kepler"]
+
+[project.scripts]
+kepler = "kepler.__main__:main"

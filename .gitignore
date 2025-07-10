@@ -1,0 +1,18 @@
+# Code editors and operating systems
+.DS_Store
+.vscode/
+.idea/
+
+# Python virtual environment
+.venv/
+
+# Python bytecode
+__pycache__/
+
+# Python distribution
+*.egg-info/
+build/
+dist/
+
+# mypy
+.mypy_cache/
