@@ -31,7 +31,9 @@ classifiers = [
 ]
 
 optional-dependencies.dev = [
-    "mypy"
+    "coverage",
+    "mypy",
+    "pytest"
 ]
 
 [project.urls]
@@ -39,12 +41,21 @@ Homepage = "https://github.com/cesium/kepler"
 Repository = "https://github.com/cesium/kepler"
 "Bug Tracker" = "https://github.com/cesium/kepler/issues"
 
+[project.scripts]
+kepler = "kepler.__main__:main"
+
+[tool.coverage]
+run.branch = true
+run.command_line = "-m pytest"
+run.source = ["kepler/"]
+html.directory = "coverage"
+
 [tool.mypy]
-packages = ["kepler"]
+packages = ["kepler", "tests"]
 strict = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.setuptools]
 packages = ["kepler"]
-
-[project.scripts]
-kepler = "kepler.__main__:main"
