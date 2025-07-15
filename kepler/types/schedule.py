@@ -1,8 +1,12 @@
 from __future__ import annotations
 from collections.abc import Iterable, Mapping
+import typing
 
 from .course import Course
 from .shift import Shift, ShiftType
+
+if typing.TYPE_CHECKING: # pragma: no coverage
+    from .student import Student
 
 class ScheduleError(Exception):
     pass
@@ -24,6 +28,18 @@ class Schedule:
 
             self.__courses[course.id] = course
             self.__shifts[course.id, shift.type] = shift
+
+    def is_valid_for_student(self, student: Student) -> bool:
+        return all(
+            student.enrollments.get(course.id) is course for course in self.__courses.values()
+        )
+
+    def is_complete_for_student(self, student: Student) -> bool:
+        mandatory_shift_types = {
+            (course.id, shift) for course, shift in student.list_mandatory_shift_types()
+        }
+
+        return set(self.__shifts) == mandatory_shift_types
 
     @property
     def shifts(self) -> Mapping[tuple[str, ShiftType], Shift]:
