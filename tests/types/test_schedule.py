@@ -4,6 +4,7 @@ import pytest
 from kepler.types.course import Course
 from kepler.types.schedule import Schedule, ScheduleError
 from kepler.types.shift import Shift, ShiftType
+from kepler.types.student import Student
 
 def test_init_no_shifts() -> None:
     schedule = Schedule([])
@@ -60,6 +61,51 @@ def test_init_courses_with_same_id() -> None:
 
     with pytest.raises(ScheduleError):
         Schedule([(course1, shift1), (course2, shift2)])
+
+def test_is_valid_for_student_true() -> None:
+    shift = Shift(ShiftType.OT, 1, 30, [])
+    course = Course('J302N2', 1, [shift])
+    student = Student('A100', 1, [course], Schedule([]))
+
+    assert Schedule([(course, shift)]).is_valid_for_student(student)
+
+def test_is_valid_for_student_false() -> None:
+    shift = Shift(ShiftType.OT, 1, 30, [])
+    course = Course('J302N2', 1, [shift])
+    student = Student('A100', 1, [], Schedule([]))
+
+    assert not Schedule([(course, shift)]).is_valid_for_student(student)
+
+def test_is_valid_for_student_courses_same_id() -> None:
+    shift = Shift(ShiftType.OT, 1, 30, [])
+    course1 = Course('J302N2', 1, [shift])
+    course2 = Course('J302N2', 2, [shift])
+    student = Student('A100', 1, [course1], Schedule([]))
+
+    assert not Schedule([(course2, shift)]).is_valid_for_student(student)
+
+def test_is_complete_for_student_true_empty() -> None:
+    course = Course('J302N2', 1, [])
+    student = Student('A100', 1, [course], Schedule([]))
+
+    assert Schedule([]).is_complete_for_student(student)
+
+def test_is_complete_for_student_true_multiple() -> None:
+    shift1 = Shift(ShiftType.T, 1, 150, [])
+    shift2 = Shift(ShiftType.OT, 1, 30, [])
+    shift3 = Shift(ShiftType.OT, 2, 30, [])
+    course = Course('J302N2', 1, [shift1, shift2, shift3])
+    student = Student('A100', 1, [course], Schedule([]))
+
+    assert Schedule([(course, shift1), (course, shift2)]).is_complete_for_student(student)
+
+def test_is_complete_for_student_false() -> None:
+    shift1 = Shift(ShiftType.T, 1, 150, [])
+    shift2 = Shift(ShiftType.OT, 1, 30, [])
+    course = Course('J302N2', 1, [shift1, shift2])
+    student = Student('A100', 1, [course], Schedule([]))
+
+    assert not Schedule([(course, shift1)]).is_complete_for_student(student)
 
 def test_eq_none() -> None:
     assert Schedule([]) != None
