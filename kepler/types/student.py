@@ -4,7 +4,7 @@ import functools
 
 from .course import Course
 from .schedule import Schedule
-from .shift import ShiftType
+from .shift import Shift, ShiftType
 
 class StudentError(Exception):
     pass
@@ -49,6 +49,40 @@ class Student:
         for course in self.__enrollments.values():
             for shift_type in course.shift_types:
                 result.add((course.id, shift_type))
+
+        return result
+
+    @property
+    def assigned_shifts(self) -> Set[tuple[Course, Shift]]:
+        return {
+            (self.__enrollments[course_id], shift)
+            for (course_id, _), shift in self.__previous_schedule.shifts.items()
+        }
+
+    @property
+    def unassignable_enrolled_shifts(self) -> Set[tuple[Course, Shift]]:
+        result: set[tuple[Course, Shift]] = set()
+
+        for (course_id, _), assigned_shift in self.__previous_schedule.shifts.items():
+            course = self.__enrollments[course_id]
+
+            for other_shift in course.shifts[assigned_shift.type].values():
+                if other_shift is assigned_shift:
+                    continue
+
+                result.add((course, other_shift))
+
+        return result
+
+    @property
+    def possible_shifts(self) -> Set[tuple[Course, Shift]]:
+        result: set[tuple[Course, Shift]] = set()
+
+        for course in self.enrollments.values():
+            for type_shifts in course.shifts.values():
+                for shift in type_shifts.values():
+                    if self.__previous_schedule.shifts.get((course.id, shift.type), shift) is shift:
+                        result.add((course, shift))
 
         return result
 

@@ -1,8 +1,9 @@
 from __future__ import annotations
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Set
 
 from .course import Course
 from .student import Student
+from .shift import ShiftType
 
 class SchedulingProblemError(Exception):
     pass
@@ -37,6 +38,26 @@ class SchedulingProblem:
     @property
     def students(self) -> Mapping[str, Student]:
         return self.__students
+
+    @property
+    def possible_students_by_shift(self) -> \
+        Mapping[tuple[str, ShiftType, int], Set[Student]]:
+
+        result: dict[tuple[str, ShiftType, int], set[Student]] = {}
+
+        for student in self.__students.values():
+            for course, shift in student.possible_shifts:
+                shift_id = course.id, shift.type, shift.number
+                result.setdefault(shift_id, set())
+                result[shift_id].add(student)
+
+        for course in self.__courses.values():
+            for _, shifts in course.shifts.items():
+                for shift in shifts.values():
+                    shift_id = course.id, shift.type, shift.number
+                    result.setdefault(shift_id, set())
+
+        return result
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SchedulingProblem):
