@@ -30,6 +30,10 @@ classifiers = [
     "Typing :: Typed"
 ]
 
+dependencies = [
+    "pulp"
+]
+
 optional-dependencies.dev = [
     "coverage",
     "mypy",
