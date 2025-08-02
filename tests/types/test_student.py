@@ -65,6 +65,37 @@ def test_list_mandatory_shift_types() -> None:
     for course, _ in mandatory_shift_types:
         assert course is course1 or course is course2
 
+def test_list_shift_groupings() -> None:
+    shift1 = Shift(ShiftType.T, 1, 100, [])
+    shift2 = Shift(ShiftType.T, 2, 100, [])
+    shift3 = Shift(ShiftType.PL, 1, 30, [])
+    shift4 = Shift(ShiftType.PL, 2, 30, [])
+    course1 = Course('J305N2', 1, [shift1, shift2, shift3, shift4])
+    course2 = Course('J305N3', 1, [shift1])
+    student = Student('A100', 2, [course1, course2], Schedule([(course1, shift3)]))
+
+    # list_assigned_shifts()
+    assigned_shifts = student.list_assigned_shifts()
+    assert assigned_shifts == {
+        (course1, shift3),
+        (course2, shift1)
+    }
+
+    # list_unassignable_shifts_in_enrolled_courses()
+    unassignable_shifts = student.list_unassignable_shifts_in_enrolled_courses()
+    assert unassignable_shifts == {
+        (course1, shift4)
+    }
+
+    # list_possible_shifts()
+    possible_shifts = student.list_possible_shifts()
+    assert possible_shifts == {
+        (course1, shift1),
+        (course1, shift2),
+        (course1, shift3),
+        (course2, shift1)
+    }
+
 def test_eq_none() -> None:
     assert Student('A100', 3, [], Schedule([])) != None
 
