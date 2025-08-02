@@ -4,7 +4,7 @@ import functools
 
 from .course import Course
 from .schedule import Schedule
-from .shift import ShiftType
+from .shift import Shift, ShiftType
 
 class StudentError(Exception):
     pass
@@ -45,6 +45,43 @@ class Student:
                 mandatory_shift_types.add((course, shift_type))
 
         return mandatory_shift_types
+
+    def list_assigned_shifts(self) -> Set[tuple[Course, Shift]]:
+        assigned_shifts = {
+            (self.__enrollments[course_id], shift)
+            for (course_id, _), shift in self.__previous_schedule.shifts.items()
+        }
+
+        for course in self.__enrollments.values():
+            for type_shifts in course.shifts.values():
+                if len(type_shifts) == 1:
+                    single_shift = next(iter(type_shifts.values()))
+                    assigned_shifts.add((course, single_shift))
+
+        return assigned_shifts
+
+    def list_unassignable_shifts_in_enrolled_courses(self) -> Set[tuple[Course, Shift]]:
+        unassignable_shifts: set[tuple[Course, Shift]] = set()
+
+        for course, assigned_shift in self.list_assigned_shifts():
+            for other_shift in course.shifts[assigned_shift.type].values():
+                if other_shift is not assigned_shift:
+                    unassignable_shifts.add((course, other_shift))
+
+        return unassignable_shifts
+
+    def list_possible_shifts(self) -> Set[tuple[Course, Shift]]:
+        possible_shifts: set[tuple[Course, Shift]] = set()
+
+        unassignable_shifts = self.list_unassignable_shifts_in_enrolled_courses()
+
+        for course in self.__enrollments.values():
+            for type_shifts in course.shifts.values():
+                for shift in type_shifts.values():
+                    if (course, shift) not in unassignable_shifts:
+                        possible_shifts.add((course, shift))
+
+        return possible_shifts
 
     @property
     def number(self) -> str:
