@@ -3,6 +3,7 @@ import pytest
 
 from kepler.types.course import Course
 from kepler.types.problem import SchedulingProblem, SchedulingProblemError
+from kepler.types.shift import Shift, ShiftType
 from kepler.types.schedule import Schedule
 from kepler.types.student import Student
 
@@ -50,6 +51,30 @@ def test_init_bad_course_reference_same_id() -> None:
 
     with pytest.raises(SchedulingProblemError):
         SchedulingProblem([course2], [student])
+
+def test_list_possible_students_by_shift() -> None:
+    shift1 = Shift(ShiftType.T, 1, 100, [])
+    shift2 = Shift(ShiftType.T, 2, 100, [])
+    shift3 = Shift(ShiftType.PL, 1, 30, [])
+    shift4 = Shift(ShiftType.PL, 2, 30, [])
+    course1 = Course('J305N1', 3, [shift1, shift2, shift3, shift4])
+
+    shift5 = Shift(ShiftType.TP, 1, 50, [])
+    course2 = Course('J305N2', 3, [shift5])
+
+    student1 = Student('A100', 3, [course1], Schedule([(course1, shift3)]))
+    student2 = Student('A200', 3, [course1], Schedule([]))
+
+    problem = SchedulingProblem([course1, course2], [student1, student2])
+
+    possible_students = problem.list_possible_students_by_shift()
+    assert possible_students == {
+        ('J305N1', ShiftType.T, 1): {student1, student2},
+        ('J305N1', ShiftType.T, 2): {student1, student2},
+        ('J305N1', ShiftType.PL, 1): {student1, student2},
+        ('J305N1', ShiftType.PL, 2): {student2},
+        ('J305N2', ShiftType.TP, 1): set(),
+    }
 
 def test_eq_none() -> None:
     assert SchedulingProblem([], []) != None
