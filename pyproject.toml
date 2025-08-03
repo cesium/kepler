@@ -30,6 +30,10 @@ classifiers = [
     "Typing :: Typed"
 ]
 
+dependencies = [
+    "pulp"
+]
+
 optional-dependencies.dev = [
     "coverage",
     "mypy",
@@ -53,6 +57,10 @@ html.directory = "coverage"
 [tool.mypy]
 packages = ["kepler", "tests"]
 strict = true
+
+[[tool.mypy.overrides]]
+module = ["pulp.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
