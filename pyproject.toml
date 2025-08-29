@@ -31,7 +31,9 @@ classifiers = [
 ]
 
 dependencies = [
-    "pulp"
+    "pulp",
+    "starlette",
+    "uvicorn"
 ]
 
 optional-dependencies.dev = [
