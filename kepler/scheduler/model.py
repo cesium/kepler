@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Set
 import itertools
 import typing
 
@@ -128,7 +128,7 @@ class SchedulingProblemModel:
         self,
         course: Course,
         shift: Shift,
-        students: Iterable[Student]) -> None:
+        students: Set[Student]) -> None:
 
         shift_capacity = shift.capacity
         restriction_variables: list[pulp.LpVariable] = []
