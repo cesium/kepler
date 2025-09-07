@@ -14,7 +14,7 @@ def main() -> None:
             model = SchedulingProblemModel(problem)
             solution = model.solve()
             io.export_json_solution_file(output_file, solution)
-        except (JsonImporterError, JsonExporterError, SchedulingProblemModelError) as e:
+        except (io.JsonImporterError, io.JsonExporterError, SchedulingProblemModelError) as e:
             print(str(e), file=sys.stderr)
 
     elif len(sys.argv) == 2 and sys.argv[1] == 'api':
