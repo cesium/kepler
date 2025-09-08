@@ -130,7 +130,7 @@ class SchedulingProblemModel:
         shift: Shift,
         students: Set[Student]) -> None:
 
-        shift_capacity = shift.capacity
+        inevitable_students = 0
         restriction_variables: list[pulp.LpVariable] = []
         for student in students:
             variable_id = student.number, course.id, shift.type, shift.number
@@ -140,15 +140,20 @@ class SchedulingProblemModel:
                 restriction_variables.append(variable)
             else:
                 # Possible students only: variable is True
-                shift_capacity -= 1
+                inevitable_students += 1
 
         if restriction_variables:
             overcrowd_variable_name = f'{course.id}_{shift.name}_OVERCROWD'
             overcrowd_variable = pulp.LpVariable(overcrowd_variable_name, 0)
 
             overcrowd_weight = config.calculate_room_overcrowd_weight(course, shift)
-            self.__model += overcrowd_variable >= sum(restriction_variables) - shift_capacity
+            reduced_capacity = shift.capacity - inevitable_students
+            self.__model += overcrowd_variable >= sum(restriction_variables) - reduced_capacity
             self.__model.objective += overcrowd_weight * overcrowd_variable
+
+            capacity_hard_limit = config.calculate_room_hard_capacity_limit(course, shift)
+            if capacity_hard_limit is not None:
+                self.__model += sum(restriction_variables) <= capacity_hard_limit
 
     @staticmethod
     def __get_solution_variable_value(variable: pulp.LpVariable | bool) -> bool:

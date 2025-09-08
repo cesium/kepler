@@ -26,3 +26,9 @@ def calculate_schedule_overlap_weight(
 
 def calculate_room_overcrowd_weight(course: Course, shift: Shift) -> float:
     return 0.1 if shift.type in [ShiftType.T, ShiftType.OT] else 1.0
+
+def calculate_room_hard_capacity_limit(course: Course, shift: Shift) -> None | int:
+    if len(course.shifts[shift.type]) == 1:
+        return None
+    else:
+        return round(shift.capacity * 1.5)
