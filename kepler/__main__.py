@@ -17,8 +17,21 @@ def main() -> None:
         except (io.JsonImporterError, io.JsonExporterError, SchedulingProblemModelError) as e:
             print(str(e), file=sys.stderr)
 
-    elif len(sys.argv) == 2 and sys.argv[1] == 'api':
-        api.API().run()
+    elif len(sys.argv) >= 2 and sys.argv[1] == 'api':
+        host = "127.0.0.1"
+        port = 8000
+        
+        if len(sys.argv) >= 3:
+            host = sys.argv[2]
+        if len(sys.argv) >= 4:
+            try:
+                port = int(sys.argv[3])
+            except ValueError:
+                print(f"Invalid port: {sys.argv[3]}", file=sys.stderr)
+                return
+        
+        api.API().run(host=host, port=port)
+
 
     else:
         print('Usage:',                                                      file=sys.stderr)
