@@ -25,8 +25,8 @@ class API:
             HTTPException: lambda _, e: JSONResponse({'error': e.detail}, status_code=e.status_code)
         })
 
-    def run(self) -> None:
-        uvicorn.run(self.__starlette)
+    def run(self, host: str, port: int) -> None:
+        uvicorn.run(self.__starlette, host=host, port=port)
 
     async def __solve(self, request: Request) -> JSONResponse:
         try:

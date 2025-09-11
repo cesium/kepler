@@ -17,13 +17,24 @@ def main() -> None:
         except (io.JsonImporterError, io.JsonExporterError, SchedulingProblemModelError) as e:
             print(str(e), file=sys.stderr)
 
-    elif len(sys.argv) == 2 and sys.argv[1] == 'api':
-        api.API().run()
+    elif len(sys.argv) == 4 and sys.argv[1] == 'api':
+        try:
+            host = sys.argv[2]
+            port = int(sys.argv[3])
+            if port < 0 or port >= 65535:
+                raise ValueError()
+
+        except ValueError:
+            print(f'Invalid port: {port}', file=sys.stderr)
+            sys.exit(1)
+
+        api.API().run(host, port)
 
     else:
         print('Usage:',                                                      file=sys.stderr)
         print('  kepler solve <problem-input.json> <schedules-output.json>', file=sys.stderr)
-        print('  kepler api',                                                file=sys.stderr)
+        print('  kepler api   <host> <port>',                                file=sys.stderr)
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
